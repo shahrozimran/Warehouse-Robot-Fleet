@@ -1,0 +1,13 @@
+export type Cell=[number,number];
+export type Robot={id:string;color:string;position:Cell;home:Cell;target:Cell;battery:number;status:string;order_id:string|null;carrying:boolean;distance:number;completed:number;wait:number;working_ticks:number;charge_sessions:number;path:Cell[];reason:string};
+export type Frame={tick:number;robots:Robot[];order_statuses:Record<string,string>;blocked_cells:Cell[];completed:number;queued:number;active:number;distance:number};
+export type Layout={width:number;height:number;shelves:{id:string;x:number;y:number;width:number;height:number;pickup:Cell;zone:string}[];docks:{id:string;position:Cell}[];chargers:{id:string;position:Cell}[];blocked_cells:Cell[]};
+export type Config={policy:string;scenario:string;fleet_size:number;order_count:number;max_ticks:number;seed:number};
+export type Metrics={completed:number;total_orders:number;completion_rate:number;makespan:number;average_cycle:number|null;on_time_rate:number;distance:number;wait_events:number;charge_sessions:number;charge_ticks:number;utilization:number;throughput:number;status:string;collision_count:number};
+export type Order={id:string;sku:string;rack_id:string;pickup:Cell;dock_id:string;dock:Cell;priority:number;release:number;due:number;status:string;robot_id:string|null;assigned_at:number|null;completed_at:number|null};
+export type Event={tick:number;kind:string;message:string;robot_id:string|null;order_id:string|null};
+export type Run={id:string;created_at:string;batch_id:string|null;config:Config;metrics:Metrics;orders:Order[];frames:Frame[];events:Event[];heatmap:number[][]};
+export type Summary=Pick<Run,'id'|'created_at'|'batch_id'|'config'|'metrics'>;
+export type Policy={id:string;name:string;short:string;color:string;description:string};
+export type Scenario={id:string;name:string;tag:string;description:string};
+export type Comparison={batch_id?:string;runs:Summary[];ranking:string[];fair_conditions:boolean;ranking_rule:string};

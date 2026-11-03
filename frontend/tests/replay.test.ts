@@ -1,0 +1,11 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {robotPose,worldCell,statusLabel} from '../src/replay.ts';
+import type {Frame,Robot} from '../src/types.ts';
+const robot=(id:string,position:[number,number])=>({id,position}as Robot);
+const frame=(robots:Robot[])=>({robots}as Frame);
+test('robot playback interpolates only between backend frames',()=>{assert.deepEqual(robotPose(frame([robot('a',[1,1])]),frame([robot('a',[2,1])]),'a',.5),[1.5,1]);});
+test('paused and final frames retain recorded position',()=>{const f=frame([robot('a',[7,9])]);assert.deepEqual(robotPose(f,undefined,'a',.8),[7,9]);assert.deepEqual(robotPose(f,frame([robot('a',[8,9])]),'a',0),[7,9]);});
+test('following robots preserve spacing under continuous interpolation',()=>{const a=frame([robot('a',[1,1]),robot('b',[2,1])]),b=frame([robot('a',[2,1]),robot('b',[3,1])]);for(const t of [0,.25,.5,.75,1])assert.equal(robotPose(a,b,'b',t)[0]-robotPose(a,b,'a',t)[0],1);});
+test('seeking clamps the phase and matches by robot ID rather than array order',()=>{const a=frame([robot('a',[1,1]),robot('b',[2,2])]),b=frame([robot('b',[2,3]),robot('a',[2,1])]);assert.deepEqual(robotPose(a,b,'a',9),[2,1]);assert.deepEqual(robotPose(a,b,'a',-1),[1,1]);});
+test('grid coordinates map to a centered warehouse without mutating positions',()=>{const cell:[number,number]=[1,1];assert.deepEqual(worldCell(cell),[-12.5,0,-8.5]);assert.deepEqual(cell,[1,1]);assert.equal(statusLabel('to_charge'),'To charger');});
